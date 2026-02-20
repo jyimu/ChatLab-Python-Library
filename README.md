@@ -135,7 +135,6 @@ chatlab/
 
 | 格式 | 扩展名 | 读取 | 写入 |
 |------|--------|------|------|
-
 | ChatLab JSON | .json | ✅ | ✅ |
 | ChatLab JSONL | .jsonl | ✅ | ✅ |
 | CSV | .csv | ✅ | ✅ |
