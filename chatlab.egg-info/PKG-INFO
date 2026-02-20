@@ -1,0 +1,177 @@
+Metadata-Version: 2.4
+Name: chatlab
+Version: 0.1.0
+Summary: ChatLab Standard Format Parser - 聊天记录分析库
+Home-page: https://github.com/chatlab/chatlab-python
+Author: ChatLab Community
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: provides-extra
+Dynamic: requires-python
+Dynamic: summary
+
+# ChatLab Python Library
+
+符合 [ChatLab Standard Format Specification](https://chatlab.fun/cn/usage/ai-converter) 的 Python 解析库。
+
+## 特性
+
+- ✅ 完整支持 ChatLab Standard Format v0.0.1
+- ✅ 兼容 WeFlow 导出格式（Python 字典单引号格式）
+- ✅ 支持 JSON / JSONL / CSV 多种格式
+- ✅ 流式解析大文件
+- ✅ 丰富的查询和统计功能
+- ✅ 数据导出和格式转换
+
+## 安装
+
+```bash1
+
+# 本地安装
+cd chatlab
+pip install -e .
+
+# 或者直接使用（无需安装）
+import sys
+sys.path.insert(0, '/path/to/chatlab')
+import chatlab
+
+```
+
+## 快速开始
+
+### 1. 加载聊天记录
+
+```python
+import chatlab
+
+# 从 WeFlow 导出的字符串加载
+raw_data = """{'chatlab': {'version': '0.0.2', ...}"""
+session = chatlab.loads(raw_data)
+
+# 从文件加载
+session = chatlab.load("chat.json")
+
+print(f"共 {len(session.messages)} 条消息")
+```
+
+### 2. 查询消息
+
+```python
+# 按发送者
+msgs = session.get_messages_by_sender("user_id")
+
+# 按日期
+msgs = session.get_messages_by_date("2026-02-12")
+
+# 关键词搜索
+msgs = session.get_messages_by_keyword("hello")
+
+# 获取统计
+stats = session.get_statistics()
+print(stats['total_messages'])
+print(stats['sender_distribution'])
+```
+
+### 3. 导出数据
+
+```python
+# 保存为 JSON
+chatlab.save(session, "output.json")
+
+# 保存为 JSONL（大文件推荐）
+chatlab.save(session, "output.jsonl", format="jsonl")
+
+# 保存为 CSV
+chatlab.save(session, "output.csv", format="csv")
+
+# 获取 JSON 字符串
+json_str = chatlab.dumps(session)
+```
+
+## 高级用法
+
+### 流式解析大文件
+
+```python
+from chatlab.parsers import JSONParser
+
+parser = JSONParser()
+for message in parser.parse_stream("large_chat.json"):
+    print(message.content)
+```
+
+### CSV 格式解析
+
+```python
+from chatlab.parsers import CSVParser
+
+parser = CSVParser()
+session = parser.parse(
+    "wechat_export.csv",
+    platform="wechat",
+    chat_name="Family Group"
+)
+```
+
+### 对话分割
+
+```python
+# 按时间间隔分割为对话线程
+threads = session.get_conversation_threads(max_gap_minutes=30)
+for thread in threads:
+    print(f"对话包含 {len(thread)} 条消息")
+```
+
+## 项目结构
+
+```files
+
+chatlab/
+├── chatlab/
+│   ├── __init__.py          # 主包入口
+│   ├── models.py            # 核心数据模型
+│   ├── parsers/             # 解析器模块
+│   │   ├── json_parser.py
+│   │   └── csv_parser.py
+│   ├── exporters/           # 导出器模块
+│   │   └── json_exporter.py
+│   └── utils/               # 工具函数
+│       └── helpers.py
+├── tests/                   # 测试文件
+├── examples/                # 使用示例
+└── docs/                    # 文档
+```
+
+## 支持的格式
+
+| 格式 | 扩展名 | 读取 | 写入 |
+|------|--------|------|------|
+
+| ChatLab JSON | .json | ✅ | ✅ |
+| ChatLab JSONL | .jsonl | ✅ | ✅ |
+| CSV | .csv | ✅ | ✅ |
+| Python Dict | - | ✅ | - |
+
+## 许可证
+
+MIT License
