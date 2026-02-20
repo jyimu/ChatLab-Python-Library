@@ -1,4 +1,0 @@
-chatlab
-docs
-examples
-tests
